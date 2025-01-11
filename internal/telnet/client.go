@@ -1,6 +1,9 @@
 package telnet
 
-import "net"
+import (
+	"fmt"
+	"net"
+)
 
 type Client struct {
 	conn net.Conn
@@ -8,6 +11,7 @@ type Client struct {
 
 func (client *Client) handleRequest() {
 
-	// read from buffer
+	fmt.Println("Client connected?")
+	client.conn.Write([]byte("Trying....\n"))
 	client.conn.Write([]byte("Connected?\n"))
 }

@@ -37,6 +37,5 @@ func (server *Server) Start() {
 		}
 
 		go client.handleRequest()
-
 	}
 }

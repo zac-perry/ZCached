@@ -1,14 +1,17 @@
 package main
 
 import (
-	"fmt"
+	"flag"
+	"strconv"
 	"zcached/internal/telnet"
 )
 
 func main() {
-	fmt.Println("Hello, world!")
 
-	server := telnet.NewServer("11211")
+	port := flag.Int("port", 11211, "port number")
+	flag.Parse()
+
+	server := telnet.NewServer(strconv.Itoa(*port))
 	server.Start()
 
 	// start the telnet server
