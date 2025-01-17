@@ -14,3 +14,14 @@ When the server receives a request, it computes a second hash of the key to dete
 ### How to run
 - Compile and run the server
 - connect using `nc localhost port`
+
+### Current todos (as of 1/16) 
+- [x] Start parsing and accepting client input
+- [x] Rename some folders/file stuff
+- [ ] Get the datastructure setup 
+    - Struct for each entry in the cache
+        - make sure to handle concurrent updates (mutexes, locks, whole shabang)
+    - the cache itself 
+    - figure out how to go ahead and get this initialized
+        - Want to support LRU, only a specific number of entries or something, etc. (need to figure out memory) 
+    

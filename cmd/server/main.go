@@ -3,17 +3,10 @@ package main
 import (
 	"flag"
 	"strconv"
-	"zcached/internal/telnet"
+	"zcached/internal/server"
 )
 
 func main() {
-
-	port := flag.Int("port", 11211, "port number")
-	flag.Parse()
-
-	server := telnet.NewServer(strconv.Itoa(*port))
-	server.Start()
-
 	// start the telnet server
 	// cmd line arguments -- port number (default is 11211)
 
@@ -21,4 +14,10 @@ func main() {
 	// IP address: 127.0.0.1 and specified port (ip is just local host)
 
 	// then, server needs to listen for requests, accept incoming request, and receive the data
+
+	port := flag.Int("port", 11211, "port number")
+	flag.Parse()
+
+	server := server.NewServer(strconv.Itoa(*port))
+	server.Start()
 }
