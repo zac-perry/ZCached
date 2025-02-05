@@ -19,7 +19,4 @@ clean:
 test:
 	@go test ./...
 
-#run:
-#	@go run main.go dns.google.com
-
 .PHONY: fmt lint vet build clean

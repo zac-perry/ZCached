@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"strings"
 )
 
 type Server struct {
@@ -61,10 +62,13 @@ func (client *Client) handleRequest() {
 	client.conn.Write([]byte("Connected!\n"))
 
 	reader := bufio.NewReader(client.conn)
+	cache := Constructor(5)
 
 	// Server stuff handling client messages
 	for {
+		// may need to change \n depending on query
 		message, err := reader.ReadString('\n')
+		messageParts := strings.Split(strings.TrimSpace(message), " ")
 		if err != nil {
 			if err == io.EOF {
 				fmt.Println("Client #", client.id, " disconnected..")
@@ -79,6 +83,10 @@ func (client *Client) handleRequest() {
 
 		fmt.Println("Messaged Recieved from client #", client.id, ": ", message)
 		client.conn.Write([]byte("Message recieved!\n"))
+		if messageParts[0] == "GET" {
+			val := cache.Get(1)
+			client.conn.Write([]byte(fmt.Sprintf("GET CALLED: %d \n", val)))
+		}
 	}
 
 	// wait for the client to type some stuff to the server
