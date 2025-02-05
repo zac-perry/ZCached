@@ -62,6 +62,7 @@ func (client *Client) handleRequest() {
 	client.conn.Write([]byte("Connected!\n"))
 
 	reader := bufio.NewReader(client.conn)
+	// TODO: default this somewhere maybe?
 	cache := Constructor(5)
 
 	// Server stuff handling client messages
@@ -69,6 +70,7 @@ func (client *Client) handleRequest() {
 		// may need to change \n depending on query
 		message, err := reader.ReadString('\n')
 		messageParts := strings.Split(strings.TrimSpace(message), " ")
+
 		if err != nil {
 			if err == io.EOF {
 				fmt.Println("Client #", client.id, " disconnected..")
@@ -83,13 +85,11 @@ func (client *Client) handleRequest() {
 
 		fmt.Println("Messaged Recieved from client #", client.id, ": ", message)
 		client.conn.Write([]byte("Message recieved!\n"))
+
 		if messageParts[0] == "GET" {
-			val := cache.Get(1)
+			val := cache.Get("1")
 			client.conn.Write([]byte(fmt.Sprintf("GET CALLED: %d \n", val)))
 		}
-	}
 
-	// wait for the client to type some stuff to the server
-	// Based on what they type, then do some shit
-	// Get and Set commands to start
+	}
 }

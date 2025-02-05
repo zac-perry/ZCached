@@ -2,6 +2,7 @@ package server
 
 import (
 	"log"
+	"time"
 )
 
 // Want to support this format of messages:
@@ -13,39 +14,68 @@ import (
 // Mainaints a map of entries for easy look up
 // Cache itself is a doubly linked list
 type Cache struct {
-	entries  map[int]*Entry
+	entries  map[string]*Entry
 	sentinel *Entry
 	capacity int
 }
 
-// TODO: Update to include needed things for memcache request
 type Entry struct {
-	key   int
-	flags []byte
-	data  []byte
-	Next  *Entry
-	Prev  *Entry
+	key        string
+	value      int // remove eventually
+	flags      uint16
+	data       []byte
+	expireTime int64
+	Next       *Entry
+	Prev       *Entry
 }
 
 func Constructor(capacity int) Cache {
 	return Cache{
-		make(map[int]*Entry, 0),
+		make(map[string]*Entry, 0),
 		&Entry{Next: nil, Prev: nil},
 		capacity,
 	}
 }
 
-// Get
-func (this *Cache) Get(key int) int {
+/*
+Get the cache entry with the specified key
+If the cache is not empty and it exists, return the value
+also need to check expire time
+*/
+func (this *Cache) Get(key string) int {
+	if len(this.entries) == 0 {
+		log.Print("Cache is empty..\n")
+		return -1
+	}
+
+	if entry, ok := this.entries[key]; ok {
+		log.Print("Value found\n")
+		if entry.Expired() {
+			log.Print("Entry was expired and removed. Sorry! \n")
+			// todo: remove the entry
+			return -1
+		}
+		return entry.value
+	}
+
 	log.Print("Get function not implemented\n")
 	return -1
 }
 
-// Put
-func (this *Cache) Put(key int, value int) {
-	log.Fatalf("Put function not implemented\n")
+/* Put */
+func (this *Cache) Put(key string, value int) {
+	log.Print("Put function not implemented\n")
+}
+
+/* Expired, returns if the current entry is expired and needs to be removed.. */
+func (this *Entry) Expired() bool {
+
+	if this.expireTime == 0 {
+		return false
+	}
+
+	return time.Now().Unix() > this.expireTime
 }
 
 // Push front
-
 // Pop

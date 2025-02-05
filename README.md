@@ -24,4 +24,6 @@ When the server receives a request, it computes a second hash of the key to dete
     - the cache itself 
     - figure out how to go ahead and get this initialized
         - Want to support LRU, only a specific number of entries or something, etc. (need to figure out memory) 
+
+- [ ] support expire time with LRU cache 
     
