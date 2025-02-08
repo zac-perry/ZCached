@@ -62,14 +62,27 @@ func (client *Client) handleRequest() {
 	client.conn.Write([]byte("Connected!\n"))
 
 	reader := bufio.NewReader(client.conn)
-	// TODO: default this somewhere maybe?
+	// TODO: default this somewhere maybe? (env file?)
 	cache := NewCache(5)
 
 	// Server stuff handling client messages
 	for {
 		// may need to change \n depending on query
 		message, err := reader.ReadString('\n')
-		messageParts := strings.Split(strings.TrimSpace(message), " ")
+		messageParts := strings.Split(message, "\\r\\n")
+		commands := strings.Fields(messageParts[0])
+		data := []string{}
+
+		if len(messageParts) > 1 {
+			data = strings.Fields(messageParts[1])
+		}
+
+		for _, c := range commands {
+			fmt.Println("part of command: ", c)
+		}
+		for _, d := range data {
+			fmt.Println("part of data: ", d)
+		}
 
 		if err != nil {
 			if err == io.EOF {
@@ -86,7 +99,8 @@ func (client *Client) handleRequest() {
 		fmt.Println("Messaged Recieved from client #", client.id, ": ", message)
 		client.conn.Write([]byte("Message recieved!\n"))
 
-		if messageParts[0] == "GET" {
+		// TODO: switch statement
+		if commands[0] == "GET" {
 			val := cache.Get("1")
 			client.conn.Write([]byte(fmt.Sprintf("GET CALLED: %d \n", val)))
 		}

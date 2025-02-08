@@ -33,3 +33,10 @@ When the server receives a request, it computes a second hash of the key to dete
 <command name> <key> <flags> <exptime> <byte count> [noreply]\r\n
 <data block>\r\n
 ```
+
+0. command name
+1. key
+2. flags
+3. expTime
+4. byte count
+5. data block?

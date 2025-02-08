@@ -76,13 +76,13 @@ func (this *Cache) Put(key string, value int) {
 	// if the cache is full, remove the least recently used (pop back)
 	// make sure to set the TTL
 
-	if entry, ok := this.entries[key]; ok {
+	/*if entry, ok := this.entries[key]; ok {
 		log.Print("PUT -- Key already exists")
 		// set everthing
 		// reset TTL, etc
 		// push to the front
 		return
-	}
+	}*/
 
 	// initialize new entry
 	// if cache is full - remove whatever is at the end.
