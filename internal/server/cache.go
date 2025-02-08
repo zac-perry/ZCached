@@ -54,17 +54,18 @@ func (this *Cache) Get(key string) int {
 		if entry.isExpired() {
 			log.Print("Entry was expired and removed. Sorry! \n")
 			// todo: remove the entry
-			// todo: call / remove
 			return -1
 		}
 		return entry.value
 	}
 
-	log.Print("Get function not implemented\n")
+  // TODO: send this message to the client..
+  log.Print("entry not found")
 	return -1
 }
 
 /* Put */
+// TODO: add other args here
 func (this *Cache) Put(key string, value int) {
 	log.Print("Put function not implemented\n")
 
@@ -76,17 +77,31 @@ func (this *Cache) Put(key string, value int) {
 	// if the cache is full, remove the least recently used (pop back)
 	// make sure to set the TTL
 
-	/*if entry, ok := this.entries[key]; ok {
+	if entry, ok := this.entries[key]; ok {
 		log.Print("PUT -- Key already exists")
 		// set everthing
+		log.Print(entry)
 		// reset TTL, etc
 		// push to the front
 		return
-	}*/
+	}
 
 	// initialize new entry
 	// if cache is full - remove whatever is at the end.
 	// Then, push to the front of the list
+	if len(this.entries) == this.capacity {
+		log.Print("Cache is full. Removing the least recently used item")
+	}
+}
+
+// TODO
+func (this *Cache) AddEntry() {
+	log.Print("Add Entry function not implemented\n")
+}
+
+// TODO
+func (this *Cache) RemoveEntry() {
+	log.Print("Remove Entry function not implemented\n")
 }
 
 /* Expired, returns if the current entry is expired and needs to be removed.. */
@@ -99,5 +114,4 @@ func (this *Entry) isExpired() bool {
 	return elapsedTime > *this.expireTime
 }
 
-// Push front
-// Pop
+// TODO: handle when to remove an expired entry
