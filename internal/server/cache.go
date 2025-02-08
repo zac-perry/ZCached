@@ -24,12 +24,13 @@ type Entry struct {
 	value      int // remove eventually
 	flags      uint16
 	data       []byte
-	expireTime int64
+	expireTime *time.Duration
+	createdAt  time.Time
 	Next       *Entry
 	Prev       *Entry
 }
 
-func Constructor(capacity int) Cache {
+func NewCache(capacity int) Cache {
 	return Cache{
 		make(map[string]*Entry, 0),
 		&Entry{Next: nil, Prev: nil},
@@ -50,9 +51,10 @@ func (this *Cache) Get(key string) int {
 
 	if entry, ok := this.entries[key]; ok {
 		log.Print("Value found\n")
-		if entry.Expired() {
+		if entry.isExpired() {
 			log.Print("Entry was expired and removed. Sorry! \n")
 			// todo: remove the entry
+			// todo: call / remove
 			return -1
 		}
 		return entry.value
@@ -65,16 +67,36 @@ func (this *Cache) Get(key string) int {
 /* Put */
 func (this *Cache) Put(key string, value int) {
 	log.Print("Put function not implemented\n")
+
+	// make sure it doesn't exist already
+	// if so, update the record and refresh the TTL
+	// push to the front of the list
+
+	// otherwise, insert, set fields
+	// if the cache is full, remove the least recently used (pop back)
+	// make sure to set the TTL
+
+	if entry, ok := this.entries[key]; ok {
+		log.Print("PUT -- Key already exists")
+		// set everthing
+		// reset TTL, etc
+		// push to the front
+		return
+	}
+
+	// initialize new entry
+	// if cache is full - remove whatever is at the end.
+	// Then, push to the front of the list
 }
 
 /* Expired, returns if the current entry is expired and needs to be removed.. */
-func (this *Entry) Expired() bool {
-
-	if this.expireTime == 0 {
+func (this *Entry) isExpired() bool {
+	if this.expireTime == nil {
 		return false
 	}
 
-	return time.Now().Unix() > this.expireTime
+	elapsedTime := time.Since(this.createdAt)
+	return elapsedTime > *this.expireTime
 }
 
 // Push front

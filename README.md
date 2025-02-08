@@ -27,3 +27,9 @@ When the server receives a request, it computes a second hash of the key to dete
 
 - [ ] support expire time with LRU cache 
     
+
+## MEMCACHE PROTOCOL
+```
+<command name> <key> <flags> <exptime> <byte count> [noreply]\r\n
+<data block>\r\n
+```

@@ -63,7 +63,7 @@ func (client *Client) handleRequest() {
 
 	reader := bufio.NewReader(client.conn)
 	// TODO: default this somewhere maybe?
-	cache := Constructor(5)
+	cache := NewCache(5)
 
 	// Server stuff handling client messages
 	for {
