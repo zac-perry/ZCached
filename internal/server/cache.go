@@ -15,8 +15,10 @@ import (
 // Cache itself is a doubly linked list
 type Cache struct {
 	entries  map[string]*Entry
-	sentinel *Entry
 	capacity int
+
+	head *Entry
+	tail *Entry
 }
 
 type Entry struct {
@@ -30,11 +32,13 @@ type Entry struct {
 	Prev       *Entry
 }
 
+// TODO: simplify this
 func NewCache(capacity int) Cache {
 	return Cache{
 		make(map[string]*Entry, 0),
-		&Entry{Next: nil, Prev: nil},
 		capacity,
+		nil,
+		nil,
 	}
 }
 
@@ -56,11 +60,13 @@ func (this *Cache) Get(key string) int {
 			// todo: remove the entry
 			return -1
 		}
+
+		// push to front
 		return entry.value
 	}
 
-  // TODO: send this message to the client..
-  log.Print("entry not found")
+	// TODO: send this message to the client..
+	log.Print("entry not found")
 	return -1
 }
 
@@ -79,8 +85,9 @@ func (this *Cache) Put(key string, value int) {
 
 	if entry, ok := this.entries[key]; ok {
 		log.Print("PUT -- Key already exists")
-		// set everthing
 		log.Print(entry)
+		// update the entry
+		// set everthing
 		// reset TTL, etc
 		// push to the front
 		return
@@ -88,23 +95,47 @@ func (this *Cache) Put(key string, value int) {
 
 	// initialize new entry
 	// if cache is full - remove whatever is at the end.
-	// Then, push to the front of the list
 	if len(this.entries) == this.capacity {
 		log.Print("Cache is full. Removing the least recently used item")
 	}
+
+	// insert, push front, return
+	// when inserting, make sure to handle the head and tail here
 }
 
 // TODO
-func (this *Cache) AddEntry() {
-	log.Print("Add Entry function not implemented\n")
+func (this *Cache) MoveEntryToFront(entry *Entry) error {
+	return nil
 }
 
-// TODO
-func (this *Cache) RemoveEntry() {
-	log.Print("Remove Entry function not implemented\n")
+/*
+RemoveLRUEntry() will remove the least recently used (LRU) entry from the cache.
+Does this by removing the tail of the linked list and deleting the entry from the map
+*/
+func (this *Cache) RemoveLRUEntry() {
+	log.Print("RemoveEntry() -- Removing LRU entry in the cache -- ", this.tail.key)
+
+	if this.tail == nil {
+		return
+	}
+
+	entryKey := this.tail.key
+	this.tail = this.tail.Prev
+	if this.tail == nil {
+		this.head = nil
+	} else {
+		this.tail.Next = nil
+	}
+
+	delete(this.entries, entryKey)
+
+	log.Print("RemoveEntry() -- Cache after removing LRU: ", this.entries)
+	return
 }
 
-/* Expired, returns if the current entry is expired and needs to be removed.. */
+/*
+isExpired(), returns if the current entry is expired and needs to be removed..
+*/
 func (this *Entry) isExpired() bool {
 	if this.expireTime == nil {
 		return false

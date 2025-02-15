@@ -19,4 +19,7 @@ clean:
 test:
 	@go test ./...
 
+run:
+	./bin/main
+
 .PHONY: fmt lint vet build clean
