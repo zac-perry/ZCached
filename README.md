@@ -27,8 +27,10 @@ When the server receives a request, it computes a second hash of the key to dete
 
 - [x] support expire time with LRU cache 
     
-- [ ] Finish GET
+- [x] Finish GET
+    - [ ] Update returns
 - [ ] Finish PUT
+    - [ ] Update returns
 - [ ] Clean up the client message handling
 
 ## MEMCACHE PROTOCOL
@@ -46,6 +48,11 @@ When the server receives a request, it computes a second hash of the key to dete
 
 ### Notes: 
 Currently implementing both LRU and TTL for the cache. This is kind of redundant in most cases. This is purely for learning purposes. If you were to actually use this, the purpose of the LRU would be to maintain certain memory limits, while the TTL would ensure data freshness. In reality, I have no use case for this lol but just thought it would be fun. 
+So far: 
+    - get works
+    - push front and remove entry works
+    - expired and lazy removing works
+
 
 ### Future ideas
 - [ ] Make the cache an actual package that can be used, k/v in mem

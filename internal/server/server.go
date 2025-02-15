@@ -99,9 +99,12 @@ func (client *Client) handleRequest() {
 		fmt.Println("Messaged Recieved from client #", client.id, ": ", message)
 		client.conn.Write([]byte("Message recieved!\n"))
 
-		// TODO: switch statement
+		// TODO: make this a switch to handle and call the correct things?
 		if commands[0] == "GET" {
-			val := cache.Get("1")
+			val, err := cache.Get("1")
+			if err != nil {
+				client.conn.Write([]byte(err.Error()))
+			}
 			client.conn.Write([]byte(fmt.Sprintf("GET CALLED: %d \n", val)))
 		}
 

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"log"
 	"time"
 )
@@ -11,8 +12,8 @@ import (
 // MAKE SURE TO HANDLE CACHE UPDATES AND ACCESSES CONCURRENTLY
 
 // Cache struct
-// Mainaints a map of entries for easy look up
-// Cache itself is a doubly linked list
+// Maintains a map of entries for easy look up
+// Maintain a doubly linked list for LRU eviction + cache size limiting
 type Cache struct {
 	entries  map[string]*Entry
 	capacity int
@@ -47,27 +48,27 @@ Get the cache entry with the specified key
 If the cache is not empty and it exists, return the value
 also need to check expire time
 */
-func (this *Cache) Get(key string) int {
+func (this *Cache) Get(key string) (int, error) {
 	if len(this.entries) == 0 {
-		log.Print("Cache is empty..\n")
-		return -1
+		log.Print("Get() -- Cache is empty..")
+		return -1, errors.New("Cache is empty")
 	}
 
 	if entry, ok := this.entries[key]; ok {
-		log.Print("Value found\n")
+		log.Print("Get() -- Cache Entry found")
+
 		if entry.isExpired() {
-			log.Print("Entry was expired and removed. Sorry! \n")
-			// todo: remove the entry
-			return -1
+			log.Print("Get() -- Entry was expired and removed. Sorry!")
+			this.RemoveEntry(entry)
+			return -1, errors.New("Entry was expired")
 		}
 
 		// push to front
-		return entry.value
+		this.MoveEntryToFront(entry)
+		return entry.value, nil
 	}
 
-	// TODO: send this message to the client..
-	log.Print("entry not found")
-	return -1
+	return -1, errors.New("Entry not found")
 }
 
 /* Put */
@@ -86,10 +87,9 @@ func (this *Cache) Put(key string, value int) {
 	if entry, ok := this.entries[key]; ok {
 		log.Print("PUT -- Key already exists")
 		log.Print(entry)
-		// update the entry
-		// set everthing
-		// reset TTL, etc
-		// push to the front
+		// todo: figure out what to do here. Update entry or just return, move to front
+		this.MoveEntryToFront(entry)
+		// return a string that just says it already exists
 		return
 	}
 
@@ -97,37 +97,52 @@ func (this *Cache) Put(key string, value int) {
 	// if cache is full - remove whatever is at the end.
 	if len(this.entries) == this.capacity {
 		log.Print("Cache is full. Removing the least recently used item")
+		this.RemoveEntry(this.tail)
 	}
 
 	// insert, push front, return
-	// when inserting, make sure to handle the head and tail here
 }
 
-// TODO
 func (this *Cache) MoveEntryToFront(entry *Entry) error {
+	log.Print("MoveEntryToFront() -- Current head of cache -- ", this.head.key)
+	log.Print("MoveEntryToFront() -- Moving entry to the front of the cache -- ", entry.key)
+	if this.head == nil {
+		this.head = entry
+		this.tail = entry
+		return nil
+	}
+
+	currHead := this.head
+	this.head = entry
+	this.head.Next = currHead
+	currHead.Prev = this.head
+
+	log.Print("MoveEntryToFront() -- New Head of Cache -- ", this.head.key)
 	return nil
 }
 
 /*
-RemoveLRUEntry() will remove the least recently used (LRU) entry from the cache.
-Does this by removing the tail of the linked list and deleting the entry from the map
+RemoveEntry() -- will remove an entry from both the cache and the linked list
 */
-func (this *Cache) RemoveLRUEntry() {
-	log.Print("RemoveEntry() -- Removing LRU entry in the cache -- ", this.tail.key)
+func (this *Cache) RemoveEntry(entry *Entry) {
+	log.Print("RemoveEntry() -- Removing an entry from the cache -- ", entry.key)
 
-	if this.tail == nil {
-		return
+	if entry.Prev != nil {
+		entry.Prev.Next = entry.Next
+	}
+	if entry.Next != nil {
+		entry.Next.Prev = entry.Prev
 	}
 
-	entryKey := this.tail.key
-	this.tail = this.tail.Prev
-	if this.tail == nil {
-		this.head = nil
-	} else {
-		this.tail.Next = nil
+	if entry == this.head {
+		this.head = entry.Next
 	}
 
-	delete(this.entries, entryKey)
+	if entry == this.tail {
+		this.tail = entry.Prev
+	}
+
+	delete(this.entries, entry.key)
 
 	log.Print("RemoveEntry() -- Cache after removing LRU: ", this.entries)
 	return
@@ -145,4 +160,17 @@ func (this *Entry) isExpired() bool {
 	return elapsedTime > *this.expireTime
 }
 
-// TODO: handle when to remove an expired entry
+/*
+printList() -- helper function for printing the dll out
+*/
+func (this *Cache) printList() {
+	var entry *Entry
+
+	entry = this.head
+	for entry != nil {
+		log.Print("Curr Key: ", entry.key)
+		log.Print("  Curr Next: ", entry.Next)
+		log.Print("  Curr Prev: ", entry.Prev)
+		entry = entry.Next
+	}
+}
