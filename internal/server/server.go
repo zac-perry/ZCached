@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"strconv"
 	"strings"
 )
 
@@ -63,7 +64,7 @@ func (client *Client) handleRequest() {
 
 	reader := bufio.NewReader(client.conn)
 	// TODO: default this somewhere maybe? (env file?)
-	cache := NewCache(5)
+	cache := NewCache(3)
 
 	// Server stuff handling client messages
 	for {
@@ -101,12 +102,18 @@ func (client *Client) handleRequest() {
 
 		// TODO: make this a switch to handle and call the correct things?
 		if commands[0] == "GET" {
-			val, err := cache.Get("1")
+			val, err := cache.Get(commands[1])
 			if err != nil {
 				client.conn.Write([]byte(err.Error()))
 			}
-			client.conn.Write([]byte(fmt.Sprintf("GET CALLED: %d \n", val)))
+			client.conn.Write([]byte(fmt.Sprintf("\nGET CALLED: %d \n", val)))
+		} else if commands[0] == "PUT" {
+			val, _ := strconv.Atoi(commands[2])
+			msg, err := cache.Put(commands[1], val)
+			if err != nil {
+				client.conn.Write([]byte(err.Error()))
+			}
+			client.conn.Write([]byte(fmt.Sprintf("PUT CALLED: %s \n", msg)))
 		}
-
 	}
 }

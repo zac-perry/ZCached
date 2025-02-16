@@ -34,9 +34,9 @@ type Entry struct {
 }
 
 // TODO: simplify this
-func NewCache(capacity int) Cache {
-	return Cache{
-		make(map[string]*Entry, 0),
+func NewCache(capacity int) *Cache {
+	return &Cache{
+		make(map[string]*Entry),
 		capacity,
 		nil,
 		nil,
@@ -48,6 +48,7 @@ Get the cache entry with the specified key
 If the cache is not empty and it exists, return the value
 also need to check expire time
 */
+// todo: refactor returns
 func (this *Cache) Get(key string) (int, error) {
 	if len(this.entries) == 0 {
 		log.Print("Get() -- Cache is empty..")
@@ -73,38 +74,43 @@ func (this *Cache) Get(key string) (int, error) {
 
 /* Put */
 // TODO: add other args here
-func (this *Cache) Put(key string, value int) {
-	log.Print("Put function not implemented\n")
+func (this *Cache) Put(key string, value int) (string, error) {
+	log.Print("Put() -- Calling put on key val: ", key, " ", value)
+	log.Print("Put() -- Checking if key already exists")
 
-	// make sure it doesn't exist already
-	// if so, update the record and refresh the TTL
-	// push to the front of the list
-
-	// otherwise, insert, set fields
-	// if the cache is full, remove the least recently used (pop back)
-	// make sure to set the TTL
-
+	// if it exists, move to the front of the dll and return
 	if entry, ok := this.entries[key]; ok {
-		log.Print("PUT -- Key already exists")
+		log.Print("Put() -- Key already exists")
 		log.Print(entry)
-		// todo: figure out what to do here. Update entry or just return, move to front
 		this.MoveEntryToFront(entry)
-		// return a string that just says it already exists
-		return
+		return "EXISTS", nil
 	}
 
 	// initialize new entry
 	// if cache is full - remove whatever is at the end.
+	log.Print("Put() -- Checking if the cache is full")
 	if len(this.entries) == this.capacity {
 		log.Print("Cache is full. Removing the least recently used item")
 		this.RemoveEntry(this.tail)
 	}
 
-	// insert, push front, return
+	log.Print("Put() -- Making new entry")
+	newEntry := &Entry{
+		key:        key,
+		value:      value,
+		expireTime: nil,
+		createdAt:  time.Now(),
+		Next:       nil,
+		Prev:       nil,
+	}
+
+	this.entries[key] = newEntry
+	this.MoveEntryToFront(newEntry)
+
+	return "STORED", nil
 }
 
 func (this *Cache) MoveEntryToFront(entry *Entry) error {
-	log.Print("MoveEntryToFront() -- Current head of cache -- ", this.head.key)
 	log.Print("MoveEntryToFront() -- Moving entry to the front of the cache -- ", entry.key)
 	if this.head == nil {
 		this.head = entry
