@@ -31,6 +31,7 @@ When the server receives a request, it computes a second hash of the key to dete
     - [ ] Update returns
 - [x] Finish PUT
     - [x] Update returns
+    - [ ] finish tests
 - [ ] Clean up the client message handling / logging 
 - [ ] clean up function args 
 - [ ] concurrency control
