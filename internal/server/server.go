@@ -24,6 +24,7 @@ type Client struct {
 func NewServer(port string) *Server {
 	fmt.Println("Using port: ", port)
 
+	// TODO: determine where to set the cache size default i guess
 	return &Server{
 		port:  port,
 		cache: NewCache(5),
@@ -68,8 +69,6 @@ func (client *Client) handleRequest() {
 	client.conn.Write([]byte("Connected!\n"))
 
 	reader := bufio.NewReader(client.conn)
-	// TODO: default this somewhere maybe? (env file?)
-	//cache := NewCache(3)
 
 	// Server stuff handling client messages
 	for {
@@ -102,23 +101,30 @@ func (client *Client) handleRequest() {
 			return
 		}
 
-		fmt.Println("Messaged Recieved from client #", client.id, ": ", message)
-		client.conn.Write([]byte("Message recieved!\n"))
+		/*	fmt.Println("Messaged Recieved from client #", client.id, ": ", message)
+			client.conn.Write([]byte("Message recieved!\n"))*/
 
-		// TODO: make this a switch to handle and call the correct things?
-		if commands[0] == "GET" {
+		switch commands[0] {
+		case "GET":
 			val, err := client.server.cache.Get(commands[1])
 			if err != nil {
 				client.conn.Write([]byte(err.Error()))
 			}
 			client.conn.Write([]byte(fmt.Sprintf("\nGET CALLED: %d \n", val)))
-		} else if commands[0] == "PUT" {
+
+		case "SET":
 			val, _ := strconv.Atoi(commands[2])
-			msg, err := client.server.cache.Put(commands[1], val)
+			msg, err := client.server.cache.Set(commands[1], val)
 			if err != nil {
 				client.conn.Write([]byte(err.Error()))
 			}
-			client.conn.Write([]byte(fmt.Sprintf("PUT CALLED: %s \n", msg)))
+			client.conn.Write([]byte(fmt.Sprintf("GET CALLED: %s \n", msg)))
+
+		case "PRINT":
+			client.server.cache.printList()
+
+		default:
+			client.conn.Write([]byte(fmt.Sprintf("\n Command not specified or supported..\n")))
 		}
 	}
 }

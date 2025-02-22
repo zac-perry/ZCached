@@ -105,13 +105,24 @@ func TestGet_ValueIsExpired(t *testing.T) {
 /*
 --------------------------
 
-# Put Function Tests
+# Set Function Tests
 
 --------------------------
 */
-func TestPut_Success(t *testing.T)          {}
-func TestPut_KeyAlreadyExists(t *testing.T) {}
-func TestPut_CacheIsFull(t *testing.T)      {}
+func TestSet_Success(t *testing.T) {
+
+	// make sure the item is successfully added to the cache
+	// ensure that it is now the new head of the list
+}
+func TestSet_KeyAlreadyExists(t *testing.T) {
+
+	// if the key already exists, don't do anything. just return
+}
+func TestSet_CacheIsFull(t *testing.T) {
+
+	// if the cache is full, evict the LRU, add new entry
+	// ensure new entry is at the front and that the removed entry is actually removed
+}
 
 /*
 --------------------------

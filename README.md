@@ -34,7 +34,7 @@ When the server receives a request, it computes a second hash of the key to dete
     - [ ] finish tests
 - [ ] Clean up the client message handling / logging 
 - [ ] clean up function args 
-- [ ] concurrency control
+- [x] concurrency control (i think it works lol)
 
 ## MEMCACHE PROTOCOL
 ```

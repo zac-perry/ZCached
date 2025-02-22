@@ -3,13 +3,12 @@ package server
 import (
 	"errors"
 	"log"
+	"sync"
 	"time"
 )
 
 // Want to support this format of messages:
 // <command name> <key> <flags> <exptime> <byte count> [noreply]\r\n <data block>\r\n
-// When a client sends the following, parse out the info and call the respective function?
-// MAKE SURE TO HANDLE CACHE UPDATES AND ACCESSES CONCURRENTLY
 
 // Cache struct
 // Maintains a map of entries for easy look up
@@ -18,6 +17,7 @@ type Cache struct {
 	entries  map[string]*Entry
 	capacity int
 
+	mu   sync.Mutex
 	head *Entry
 	tail *Entry
 }
@@ -36,10 +36,11 @@ type Entry struct {
 // TODO: simplify this
 func NewCache(capacity int) *Cache {
 	return &Cache{
-		make(map[string]*Entry),
-		capacity,
-		nil,
-		nil,
+		entries:  make(map[string]*Entry),
+		capacity: capacity,
+		mu:       sync.Mutex{},
+		head:     nil,
+		tail:     nil,
 	}
 }
 
@@ -50,6 +51,9 @@ also need to check expire time
 */
 // todo: refactor returns
 func (this *Cache) Get(key string) (int, error) {
+	this.mu.Lock()
+	defer this.mu.Unlock()
+
 	if len(this.entries) == 0 {
 		log.Print("Get() -- Cache is empty..")
 		return -1, errors.New("Cache is empty")
@@ -72,15 +76,18 @@ func (this *Cache) Get(key string) (int, error) {
 	return -1, errors.New("Entry not found")
 }
 
-/* Put */
+/* Set */
 // TODO: add other args here
-func (this *Cache) Put(key string, value int) (string, error) {
-	log.Print("Put() -- Calling put on key val: ", key, " ", value)
-	log.Print("Put() -- Checking if key already exists")
+func (this *Cache) Set(key string, value int) (string, error) {
+	this.mu.Lock()
+	defer this.mu.Unlock()
+
+	log.Print("Set() -- Calling put on key val: ", key, " ", value)
+	log.Print("Set() -- Checking if key already exists")
 
 	// if it exists, move to the front of the dll and return
 	if entry, ok := this.entries[key]; ok {
-		log.Print("Put() -- Key already exists")
+		log.Print("Set() -- Key already exists")
 		log.Print(entry)
 		this.MoveEntryToFront(entry)
 		return "EXISTS", nil
@@ -88,13 +95,13 @@ func (this *Cache) Put(key string, value int) (string, error) {
 
 	// initialize new entry
 	// if cache is full - remove whatever is at the end.
-	log.Print("Put() -- Checking if the cache is full")
+	log.Print("Set() -- Checking if the cache is full")
 	if len(this.entries) == this.capacity {
 		log.Print("Cache is full. Removing the least recently used item")
 		this.RemoveEntry(this.tail)
 	}
 
-	log.Print("Put() -- Making new entry")
+	log.Print("Set() -- Making new entry")
 	newEntry := &Entry{
 		key:        key,
 		value:      value,
@@ -116,12 +123,26 @@ func (this *Cache) MoveEntryToFront(entry *Entry) error {
 		this.head = entry
 		this.tail = entry
 		return nil
+	} else if entry == this.head {
+		return nil
 	}
 
-	currHead := this.head
+	if entry.Prev != nil {
+		entry.Prev.Next = entry.Next
+	}
+
+	if entry.Next != nil {
+		entry.Next.Prev = entry.Prev
+	}
+
+	if entry == this.tail {
+		this.tail = entry.Prev
+	}
+
+	entry.Next = this.head
+	entry.Prev = nil 
+	this.head.Prev = entry
 	this.head = entry
-	this.head.Next = currHead
-	currHead.Prev = this.head
 
 	log.Print("MoveEntryToFront() -- New Head of Cache -- ", this.head.key)
 	return nil
@@ -171,12 +192,26 @@ printList() -- helper function for printing the dll out
 */
 func (this *Cache) printList() {
 	var entry *Entry
-
+	var entryNum int
 	entry = this.head
-	for entry != nil {
-		log.Print("Curr Key: ", entry.key)
-		log.Print("  Curr Next: ", entry.Next)
-		log.Print("  Curr Prev: ", entry.Prev)
-		entry = entry.Next
+	if entry == nil {
+		log.Print("printList() -- Cache is currently empty.")
+		return
 	}
+
+	entryNum = 1
+	for entry != nil {
+		log.Print(entryNum, ". Curr Key: ", entry.key)
+		log.Print("-  Curr Next: ", entry.Next)
+		log.Print("-  Curr Prev: ", entry.Prev)
+		log.Print("------------------------------------")
+		if entry.Next == entry || entry.Next == this.head {
+			break
+		}
+		entry = entry.Next
+		entryNum += 1
+	}
+
+	log.Print("Current head: ", this.head)
+	log.Print("Current tail: ", this.tail)
 }
