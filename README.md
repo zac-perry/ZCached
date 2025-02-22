@@ -26,7 +26,7 @@ When the server receives a request, it computes a second hash of the key to dete
         - Want to support LRU, only a specific number of entries or something, etc. (need to figure out memory) 
 
 - [x] support expire time with LRU cache 
-    
+- [x] fix shared cache bug (clients using their own instance) 
 - [x] Finish GET
     - [ ] Update returns
 - [x] Finish PUT
@@ -63,4 +63,5 @@ So far:
 - [ ] support storage of anything (pointer to struct, etc)
 - [ ] downtime recovery (similar to gocache) -> reload previously used caches, etc.
 - [ ] add backup clean up process using the time.Ticker lib
-- [ ] Look into if using LRU for an actual cache, with this sort of expiration stuff is alright. LRU really only required if I want to set a memory limit or cache entry limit (which doing this in terms of system stats may be better)
+- [x] Look into if using LRU for an actual cache, with this sort of expiration stuff is alright. LRU really only required if I want to set a memory limit or cache entry limit (which doing this in terms of system stats may be better)
+

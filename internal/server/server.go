@@ -11,18 +11,22 @@ import (
 )
 
 type Server struct {
-	port string
+	port  string
+	cache *Cache
 }
 
 type Client struct {
-	conn net.Conn
-	id   int
+	conn   net.Conn
+	server *Server
+	id     int
 }
 
 func NewServer(port string) *Server {
 	fmt.Println("Using port: ", port)
+
 	return &Server{
-		port: port,
+		port:  port,
+		cache: NewCache(5),
 	}
 }
 
@@ -46,8 +50,9 @@ func (server *Server) Start() {
 
 		// client stuff
 		client := &Client{
-			id:   id,
-			conn: conn,
+			id:     id,
+			conn:   conn,
+			server: server,
 		}
 
 		go client.handleRequest()
@@ -64,7 +69,7 @@ func (client *Client) handleRequest() {
 
 	reader := bufio.NewReader(client.conn)
 	// TODO: default this somewhere maybe? (env file?)
-	cache := NewCache(3)
+	//cache := NewCache(3)
 
 	// Server stuff handling client messages
 	for {
@@ -102,14 +107,14 @@ func (client *Client) handleRequest() {
 
 		// TODO: make this a switch to handle and call the correct things?
 		if commands[0] == "GET" {
-			val, err := cache.Get(commands[1])
+			val, err := client.server.cache.Get(commands[1])
 			if err != nil {
 				client.conn.Write([]byte(err.Error()))
 			}
 			client.conn.Write([]byte(fmt.Sprintf("\nGET CALLED: %d \n", val)))
 		} else if commands[0] == "PUT" {
 			val, _ := strconv.Atoi(commands[2])
-			msg, err := cache.Put(commands[1], val)
+			msg, err := client.server.cache.Put(commands[1], val)
 			if err != nil {
 				client.conn.Write([]byte(err.Error()))
 			}
