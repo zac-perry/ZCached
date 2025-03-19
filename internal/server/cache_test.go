@@ -80,7 +80,7 @@ func TestGet_CacheIsEmpty(t *testing.T) {
 	_, err := cache.Get("4")
 
 	if err == nil {
-		t.Error("Value does not exist check failed")
+		t.Error("Empty cache check failed")
 	}
 }
 
@@ -110,18 +110,60 @@ func TestGet_ValueIsExpired(t *testing.T) {
 --------------------------
 */
 func TestSet_Success(t *testing.T) {
+	// Ensure Set works
+	cache := NewCache(1)
 
-	// make sure the item is successfully added to the cache
-	// ensure that it is now the new head of the list
+	_, err := cache.Set("1", 100)
+	if err != nil {
+		t.Error("Error setting value in cache")
+	}
+
+	if len(cache.entries) == 0 {
+		t.Error("Error -- values wasn't added to the cache entries")
+	}
 }
+
 func TestSet_KeyAlreadyExists(t *testing.T) {
+	// Ensure duplicate key check is working
+	cache := NewCache(1)
 
-	// if the key already exists, don't do anything. just return
+	_, err := cache.Set("1", 100)
+	if err != nil {
+		t.Error("Error -- setting value in cache")
+	}
+
+	if len(cache.entries) == 0 {
+		t.Error("Error -- values wasn't added to the cache entries")
+	}
+
+	_, err = cache.Set("1", 100)
+	if err == nil {
+		t.Error("Error -- Duplicate entry added to the cache when it shouldn't have been")
+	}
 }
-func TestSet_CacheIsFull(t *testing.T) {
 
-	// if the cache is full, evict the LRU, add new entry
-	// ensure new entry is at the front and that the removed entry is actually removed
+func TestSet_CacheIsFull(t *testing.T) {
+	// Ensure eviction is working
+	cache := NewCache(1)
+
+	_, err := cache.Set("1", 100)
+	if err != nil {
+		t.Error("Error -- setting value in cache")
+	}
+
+	_, err = cache.Set("2", 200)
+	if err != nil {
+		t.Error("Error -- setting value in cache")
+	}
+
+	val, err := cache.Get("2")
+	if err != nil {
+		t.Error("Error -- retrieving value set in cache")
+	}
+
+	if val != 200 || cache.head.value != 200 {
+		t.Error("Error -- old entry wasn't evicted for new one")
+	}
 }
 
 /*

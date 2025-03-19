@@ -40,6 +40,9 @@ func (server *Server) Start() {
 		log.Fatal(err)
 	}
 
+	// TODO:
+	// If i want to do a graceful shutdown type thing, will have to add WG here to add client processes.
+	// Whenever shutting down, will need to make sure to clear out client connections that still exist, etc.
 	defer listen.Close()
 	id := 1
 
@@ -83,10 +86,10 @@ func (client *Client) handleRequest() {
 		}
 
 		for _, c := range commands {
-			fmt.Println("part of command: ", c)
+			fmt.Println("DEBUG -- part of command: ", c)
 		}
 		for _, d := range data {
-			fmt.Println("part of data: ", d)
+			fmt.Println("DEBUG -- part of data: ", d)
 		}
 
 		if err != nil {
@@ -105,6 +108,7 @@ func (client *Client) handleRequest() {
 			client.conn.Write([]byte("Message recieved!\n"))*/
 
 		switch commands[0] {
+		// TOOD: Add update, etc.
 		case "GET":
 			val, err := client.server.cache.Get(commands[1])
 			if err != nil {
@@ -119,6 +123,9 @@ func (client *Client) handleRequest() {
 				client.conn.Write([]byte(err.Error()))
 			}
 			client.conn.Write([]byte(fmt.Sprintf("GET CALLED: %s \n", msg)))
+
+		case "UPDATE":
+			client.conn.Write([]byte(fmt.Sprintf("UPDATE CALLED: (NOT IMPLEMENTED)\n")))
 
 		case "PRINT":
 			client.server.cache.printList()

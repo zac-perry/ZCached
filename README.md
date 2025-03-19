@@ -15,7 +15,7 @@ When the server receives a request, it computes a second hash of the key to dete
 - Compile and run the server
 - connect using `nc localhost port`
 
-### Current todos (as of 1/16) 
+### Current todos
 - [x] Start parsing and accepting client input
 - [x] Rename some folders/file stuff
 - [x] Get the datastructure setup 
@@ -34,7 +34,9 @@ When the server receives a request, it computes a second hash of the key to dete
     - [ ] finish tests
 - [ ] Clean up the client message handling / logging 
 - [ ] clean up function args 
-- [x] concurrency control (i think it works lol)
+- [ ] TCP graceful shutdown 
+- [ ] UPDATE, other functions
+- [x] concurrency control
 
 ## MEMCACHE PROTOCOL
 ```

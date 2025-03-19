@@ -22,6 +22,7 @@ type Cache struct {
 	tail *Entry
 }
 
+// TODO: make this less disgusting i guess, idk how yet but it looks weird and bothers me >:(
 type Entry struct {
 	key        string
 	value      int // remove eventually
@@ -33,7 +34,6 @@ type Entry struct {
 	Prev       *Entry
 }
 
-// TODO: simplify this
 func NewCache(capacity int) *Cache {
 	return &Cache{
 		entries:  make(map[string]*Entry),
@@ -90,7 +90,7 @@ func (this *Cache) Set(key string, value int) (string, error) {
 		log.Print("Set() -- Key already exists")
 		log.Print(entry)
 		this.MoveEntryToFront(entry)
-		return "EXISTS", nil
+		return "EXISTS", errors.New("Cache entry already exists")
 	}
 
 	// initialize new entry
@@ -140,7 +140,7 @@ func (this *Cache) MoveEntryToFront(entry *Entry) error {
 	}
 
 	entry.Next = this.head
-	entry.Prev = nil 
+	entry.Prev = nil
 	this.head.Prev = entry
 	this.head = entry
 

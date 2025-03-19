@@ -8,4 +8,5 @@
 go.work
 tmp/
 .env
-bin/
+bin/*
+
