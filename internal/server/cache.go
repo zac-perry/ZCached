@@ -22,7 +22,8 @@ type Cache struct {
 	tail *Entry
 }
 
-// TODO: make this less disgusting i guess, idk how yet but it looks weird and bothers me >:(
+// TODO: allow a value to be "anything" -- int, string, list, etc.
+// Can allow JSON, whatever other format potentially
 type Entry struct {
 	key        string
 	value      int // remove eventually
@@ -117,7 +118,17 @@ func (this *Cache) Set(key string, value int) (string, error) {
 	return "STORED", nil
 }
 
+/* Update(): update the value for the given key */
+func (this *Cache) Update(key string, value int) (string, error) {
+	// find the cache entry
+	// Update the value
+	// move to front, refresh time, etc.
+	// can probably just call get here (assuming I update the returns) and then change, set.
+	return "", nil
+}
+
 func (this *Cache) MoveEntryToFront(entry *Entry) error {
+
 	log.Print("MoveEntryToFront() -- Moving entry to the front of the cache -- ", entry.key)
 	if this.head == nil {
 		this.head = entry

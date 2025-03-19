@@ -108,8 +108,13 @@ func (client *Client) handleRequest() {
 			client.conn.Write([]byte("Message recieved!\n"))*/
 
 		switch commands[0] {
-		// TOOD: Add update, etc.
 		case "GET":
+			if len(commands) != 2 {
+				client.conn.Write(
+					[]byte(fmt.Sprintf("GET: Incorrect usage. Must be: GET key\n")),
+				)
+				break
+			}
 			val, err := client.server.cache.Get(commands[1])
 			if err != nil {
 				client.conn.Write([]byte(err.Error()))
@@ -117,6 +122,13 @@ func (client *Client) handleRequest() {
 			client.conn.Write([]byte(fmt.Sprintf("\nGET CALLED: %d \n", val)))
 
 		case "SET":
+			// increase this at some point i guess
+			if len(commands) != 3 {
+				client.conn.Write(
+					[]byte(fmt.Sprintf("SET: Incorrect usage. Must be: SET key val \n")),
+				)
+				break
+			}
 			val, _ := strconv.Atoi(commands[2])
 			msg, err := client.server.cache.Set(commands[1], val)
 			if err != nil {

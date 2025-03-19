@@ -19,24 +19,20 @@ When the server receives a request, it computes a second hash of the key to dete
 - [x] Start parsing and accepting client input
 - [x] Rename some folders/file stuff
 - [x] Get the datastructure setup 
-    - Struct for each entry in the cache
-        - make sure to handle concurrent updates (mutexes, locks, whole shabang)
-    - the cache itself 
-    - figure out how to go ahead and get this initialized
-        - Want to support LRU, only a specific number of entries or something, etc. (need to figure out memory) 
-
 - [x] support expire time with LRU cache 
 - [x] fix shared cache bug (clients using their own instance) 
 - [x] Finish GET
     - [ ] Update returns
 - [x] Finish PUT
     - [x] Update returns
-    - [ ] finish tests
+    - [x] finish tests
 - [ ] Clean up the client message handling / logging 
 - [ ] clean up function args 
 - [ ] TCP graceful shutdown 
 - [ ] UPDATE, other functions
 - [x] concurrency control
+- [ ] Figure out expire time rotation (refresh time IF value is used?)
+    - At what point is this silly goofy and not epic?
 
 ## MEMCACHE PROTOCOL
 ```
