@@ -51,6 +51,7 @@ If the cache is not empty and it exists, return the value
 also need to check expire time
 */
 // todo: refactor returns
+// Return the entire entry?
 func (this *Cache) Get(key string) (int, error) {
 	this.mu.Lock()
 	defer this.mu.Unlock()
@@ -128,7 +129,6 @@ func (this *Cache) Update(key string, value int) (string, error) {
 }
 
 func (this *Cache) MoveEntryToFront(entry *Entry) error {
-
 	log.Print("MoveEntryToFront() -- Moving entry to the front of the cache -- ", entry.key)
 	if this.head == nil {
 		this.head = entry

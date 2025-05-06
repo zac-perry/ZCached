@@ -122,7 +122,7 @@ func (client *Client) handleRequest() {
 			client.conn.Write([]byte(fmt.Sprintf("\nGET CALLED: %d \n", val)))
 
 		case "SET":
-			// increase this at some point i guess
+      // TODO -- increase this to support full memcache request protocol
 			if len(commands) != 3 {
 				client.conn.Write(
 					[]byte(fmt.Sprintf("SET: Incorrect usage. Must be: SET key val \n")),

@@ -2,7 +2,7 @@
 ZCached is a high-performance, distributed memory object caching system (its just a memcached clone)
 
 ### Goal
-Goal for this project is to build my own memcached server. Intended to be used for  speeding up web applications by reducing the DB load.
+Goal for this project is to build my own memcached inspired server. Intended to be used for  speeding up web applications by reducing the DB load.
 Memcached is an inmemory key-value store for small chunks of data retrieved from backend systems with higher latency. 
 
 
@@ -32,7 +32,6 @@ When the server receives a request, it computes a second hash of the key to dete
 - [ ] UPDATE, other functions
 - [x] concurrency control
 - [ ] Figure out expire time rotation (refresh time IF value is used?)
-    - At what point is this silly goofy and not epic?
 
 ## MEMCACHE PROTOCOL
 ```
@@ -45,7 +44,7 @@ When the server receives a request, it computes a second hash of the key to dete
 2. flags
 3. expTime
 4. byte count
-5. data block?
+5. data block
 
 ### Notes: 
 Currently implementing both LRU and TTL for the cache. This is kind of redundant in most cases. This is purely for learning purposes. If you were to actually use this, the purpose of the LRU would be to maintain certain memory limits, while the TTL would ensure data freshness. In reality, I have no use case for this lol but just thought it would be fun. 
@@ -56,10 +55,7 @@ So far:
 
 
 ### Future ideas
-- [ ] Make the cache an actual package that can be used, k/v in mem
-- [ ] Make ux not horrible, defaults for expiration times, etc.
 - [ ] support storage of anything (pointer to struct, etc)
 - [ ] downtime recovery (similar to gocache) -> reload previously used caches, etc.
-- [ ] add backup clean up process using the time.Ticker lib
-- [x] Look into if using LRU for an actual cache, with this sort of expiration stuff is alright. LRU really only required if I want to set a memory limit or cache entry limit (which doing this in terms of system stats may be better)
+- [ ] (maybe) add backup clean up process using the time.Ticker lib 
 

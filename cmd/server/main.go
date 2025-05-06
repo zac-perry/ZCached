@@ -18,6 +18,7 @@ func main() {
 	port := flag.Int("port", 11211, "port number")
 	flag.Parse()
 
+	// TODO: maybe set cache size here?
 	server := server.NewServer(strconv.Itoa(*port))
 	server.Start()
 }
