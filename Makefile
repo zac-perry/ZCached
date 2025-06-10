@@ -14,7 +14,7 @@ build: vet
 
 clean:
 	@go clean
-	rm bin/main
+	rm bin/*
 
 test:
 	@go test ./...

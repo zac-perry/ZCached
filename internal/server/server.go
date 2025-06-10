@@ -24,7 +24,6 @@ type Client struct {
 func NewServer(port string) *Server {
 	fmt.Println("Using port: ", port)
 
-	// TODO: determine where to set the cache size default i guess
 	return &Server{
 		port:  port,
 		cache: NewCache(5),
@@ -40,9 +39,6 @@ func (server *Server) Start() {
 		log.Fatal(err)
 	}
 
-	// TODO:
-	// If i want to do a graceful shutdown type thing, will have to add WG here to add client processes.
-	// Whenever shutting down, will need to make sure to clear out client connections that still exist, etc.
 	defer listen.Close()
 	id := 1
 
@@ -122,7 +118,7 @@ func (client *Client) handleRequest() {
 			client.conn.Write([]byte(fmt.Sprintf("\nGET CALLED: %d \n", val)))
 
 		case "SET":
-      // TODO -- increase this to support full memcache request protocol
+			// TODO -- increase this to support full memcache request protocol
 			if len(commands) != 3 {
 				client.conn.Write(
 					[]byte(fmt.Sprintf("SET: Incorrect usage. Must be: SET key val \n")),

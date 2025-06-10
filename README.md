@@ -1,5 +1,5 @@
 # ZCached
-ZCached is a high-performance, distributed memory object caching system (its just a memcached clone)
+ZCached is a high-performance, distributed memory object caching system
 
 ### Goal
 Goal for this project is to build my own memcached inspired server. Intended to be used for  speeding up web applications by reducing the DB load.
@@ -59,3 +59,41 @@ So far:
 - [ ] downtime recovery (similar to gocache) -> reload previously used caches, etc.
 - [ ] (maybe) add backup clean up process using the time.Ticker lib 
 
+
+
+### Package ideas
+- create this in the context of actually using it as a caching package
+- Support different configs (LRU, some others maybe, TTL, etc) 
+- Multiple opertaions
+- Downtime recovery
+- Concurrency support through mutexes, etc.
+
+- I think this way, I can publish this as an actual go package. No one will probably use it (including me lol), but would be a good expeirence and nice to have for my portfolio
+
+```Go
+//Example of something I could .
+// Cache represents a thread-safe caching system with TTL and LRU capabilities
+type Cache[K comparable, V any] interface {
+    // Basic operations
+    Get(key K) (value V, found bool)
+    Set(key K, value V) error
+    SetWithTTL(key K, value V, ttl time.Duration) error
+    Delete(key K) error
+    Has(key K) bool
+    
+    // Batch operations
+    GetMulti(keys []K) map[K]V
+    SetMulti(items map[K]V) error
+    DeleteMulti(keys []K) error
+    
+    // Cache management
+    Clear() error
+    Count() int
+    Keys() []K
+    
+    // Advanced options
+    SetMaxSize(size int)
+    SetDefaultTTL(ttl time.Duration)
+    OnEvicted(callback func(key K, value V))
+}
+```

@@ -7,9 +7,6 @@ import (
 	"time"
 )
 
-// Want to support this format of messages:
-// <command name> <key> <flags> <exptime> <byte count> [noreply]\r\n <data block>\r\n
-
 // Cache struct
 // Maintains a map of entries for easy look up
 // Maintain a doubly linked list for LRU eviction + cache size limiting
